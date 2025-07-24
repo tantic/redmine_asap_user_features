@@ -1,0 +1,3 @@
+document.querySelectorAll('[data-issue-id="<%= @issue.id %>"]').forEach(function(el){
+  el.closest('.bg-white').remove();
+});

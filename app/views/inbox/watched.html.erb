@@ -1,0 +1,9 @@
+<div class="flex h-[calc(100vh-6rem)]  overflow-auto">
+  <%= render "shared/sidebar" %>
+
+  <div data-controller="inbox" class="flex flex-1 h-full ml-14">
+    <%= render :partial => "column_left", locals: {issues: nil, issues_watched: @issues_watched} %>
+    <%= render :partial => "column_middle", locals: {issues: @issues_watched} %>
+    <%= render "column_right" %>
+  </div>
+</div>

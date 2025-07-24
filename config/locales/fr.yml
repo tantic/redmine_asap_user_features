@@ -1,0 +1,21 @@
+fr:
+  label_avatar: "Avatar"
+  message_avatar_uploaded: "Avatar enregistré"
+  button_change_avatar: "Modifier l'avatar"
+  are_you_sure_delete_avatar: "Êtes-vous certain de vouloir supprimer votre avatar?"
+  avatar_deleted: "Avatar supprimé"
+  unable_to_delete_avatar: "Une erreur est survenue lors de la suppression de l'avatar."
+  label_menu_asap_my_space: "Mon espace"
+  label_menu_asap_todo: "Todo"
+  label_menu_asap_inbox: "Boîte de réception"
+  label_created_on: Créé il y a
+  todo_category: "Todo"
+  todo_link: "Mes tâches"
+  inbox_category: "Boîte de réception"
+  inbox_favorite_category: "Favoris"
+  inbox_link: "Assignées"
+  configuration_required_message: "L'utilisation du plugin nécessite des paramétrages de la part de l'administrateur de la plateforme.\n Le projet parent ainsi que le tracker utilisé doivent être configurés."
+  label_todo_add: + Ajouter
+  label_todo_create: Créer
+  label_todo_cancel: Annuler
+  label_todo_new: Nouvelle tâche...

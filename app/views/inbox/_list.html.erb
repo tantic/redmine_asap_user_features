@@ -1,0 +1,34 @@
+
+<% if issues %>
+  <ul class="mt-4">
+    <% issues.each do |issue| %>
+      <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
+      <%= hidden_field_tag 'ids[]', issue.id %>
+        <li id="issue-<%= issue.id %>" class="bg-white hover:bg-gray-100 p-4 cursor-pointer flex  shadow border-b border-gray-100 hascontextmenu  "
+            data-action="click->inbox#show"
+            data-inbox-id-param="<%= issue.id %>"
+            data-inbox-target="item">
+            <div class="mr-2">
+              <%= author_avatar(issue.author, :size => "30") %>
+            </div>
+            <div class="flex flex-col">
+              <div class="mb-2">
+                <span class="text-gray-700"><%= issue.author %></span>
+                <div class="ml-auto text-gray-400 text-xs">
+                  <% if issue.created_on != issue.updated_on %>
+                    <%= l(:label_updated_time, time_tag(issue.updated_on)).html_safe %>
+                  <% else %>
+                    <%= l(:label_created_on) %>&nbsp;<%= time_tag(issue.created_on) %>
+                  <% end %>
+                </div>
+              </div>
+              <div>
+                <strong>#<%= issue.id %></strong> - <%= issue.subject %>
+              </div>
+            </div>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+<% end %>
+<%= context_menu %>

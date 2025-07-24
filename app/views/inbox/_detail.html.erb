@@ -1,0 +1,156 @@
+<% @issue ||= defined?(issue) ? issue : nil %>
+<% @journals ||= defined?(journals) ? journals : [] %>
+
+<header class="w-full bg-white shadow px-8 py-4 flex items-center mb-2">
+  <h3 class="font-medium py-2 my-0! text-sm flex">
+    <strong>#<%= @issue.id %></strong> - <%= @issue.subject %>
+  </h3>
+
+  <div id="issue-menu" class="contextual ml-auto!">
+
+    <%= actions_dropdown do %>
+      <%= link_to sprite_icon('edit', l(:button_edit)), edit_issue_path(@issue),
+      :onclick => 'showAndScrollTo("update", "issue_notes"); return false;',
+      :class => 'icon icon-edit ', :accesskey => accesskey(:edit) if @issue.editable? %>
+
+      <%= watcher_link(@issue, User.current) %>
+
+      <%= copy_object_url_link(issue_url(@issue, only_path: false)) %>
+
+
+      <%= link_to sprite_icon('time-add', l(:button_log_time)), new_issue_time_entry_path(@issue),
+                  :class => 'icon icon-time-add ' if User.current.allowed_to?(:log_time, @project) %>
+      <%= link_to sprite_icon('copy', l(:button_copy)), project_copy_issue_path(@project, @issue),
+                  :class => 'icon icon-copy ' if User.current.allowed_to?(:copy_issues, @project) && Issue.allowed_target_projects.any? %>
+                  <%= link_to sprite_icon('del', l(:button_delete_object, object_name: l(:label_issue)).capitalize), issue_path(@issue),
+                  :data => {:confirm => issues_destroy_confirmation_message(@issue)},
+                  :method => :delete, :class => 'icon icon-del ' if @issue.deletable? %>
+    <% end %>
+    </div>
+
+</header>
+
+<section class="w-full bg-white shadow px-8 py-8 flex flex-col">
+  <div class="flex items-center mb-4">
+    <%= author_avatar(@issue.author, :size => "30") %>
+    <div class="ml-3 flex flex-col">
+      <div><%= @issue.author %></div>
+    </div>
+    <div class="ml-auto"><%= link_to_project(@issue.project) %></div>
+  </div>
+  <div id="attribute" class="bg-gray-50 rounded p-8">
+    <%= issue_fields_rows do |rows|
+      rows.left l(:field_status), @issue.status.name, :class => 'status'
+
+      unless @issue.disabled_core_fields.include?('priority_id')
+        rows.left l(:field_priority), @issue.priority.name, :class => 'priority'
+      end
+      unless @issue.disabled_core_fields.include?('assigned_to_id')
+        rows.left l(:field_assigned_to), (@issue.assigned_to ? link_to_principal(@issue.assigned_to) : "-"), :class => 'assigned-to'
+      end
+      unless @issue.disabled_core_fields.include?('category_id') || (@issue.category.nil? && @issue.project.issue_categories.none?)
+        rows.left l(:field_category), (@issue.category ? @issue.category.name : "-"), :class => 'category'
+      end
+      unless @issue.disabled_core_fields.include?('fixed_version_id') || (@issue.fixed_version.nil? && @issue.assignable_versions.none?)
+        rows.left l(:field_fixed_version), (@issue.fixed_version ? link_to_version(@issue.fixed_version) : "-"), :class => 'fixed-version'
+      end
+
+      unless @issue.disabled_core_fields.include?('start_date')
+        rows.right l(:field_start_date), format_date(@issue.start_date), :class => 'start-date'
+      end
+      unless @issue.disabled_core_fields.include?('due_date')
+        rows.right l(:field_due_date), issue_due_date_details(@issue), :class => 'due-date'
+      end
+      unless @issue.disabled_core_fields.include?('done_ratio')
+        rows.right l(:field_done_ratio), progress_bar(@issue.done_ratio, :legend => "#{@issue.done_ratio}%"), :class => 'progress'
+      end
+      unless @issue.disabled_core_fields.include?('estimated_hours')
+        rows.right l(:field_estimated_hours), issue_estimated_hours_details(@issue), :class => 'estimated-hours'
+      end
+      if User.current.allowed_to?(:view_time_entries, @project) && @issue.total_spent_hours > 0
+        rows.right l(:label_spent_time), issue_spent_hours_details(@issue), :class => 'spent-time'
+      end
+    end %>
+    <%= render_half_width_custom_fields_rows(@issue) %>
+  </div>
+
+</section>
+
+<section class="w-full bg-white shadow px-8 py-2 flex no-wrap flex-col">
+  <% if @issue.description? %>
+  <div id="issue_description_wiki" class="wiki py-4 mb-6 text-wrap">
+    <%= textilizable @issue, :description, :attachments => @issue.attachments %>
+    </div>
+  <% end %>
+
+  <% if @issue.attachments.any? %>
+    <div id="issue-attachments" class="border-t border-gray-100 pt-6 mb-6">
+      <p class="pb-4"><strong><%=l(:label_attachment_plural)%></strong></p>
+      <%= link_to_attachments @issue, :thumbnails => true %>
+    </div>
+  <% end %>
+
+
+</section>
+
+
+<% if !@issue.leaf? || User.current.allowed_to?(:manage_subtasks, @project) || @relations.present? || User.current.allowed_to?(:manage_issue_relations, @project)  %>
+<section class="w-full bg-white shadow px-8 py-8 flex no-wrap flex-col mt-2">
+  <% if !@issue.leaf? || User.current.allowed_to?(:manage_subtasks, @project) %>
+
+  <div id="issue_tree">
+  <%= render :partial => 'issues/subtasks' %>
+  </div>
+  <% end %>
+
+  <% if @relations.present? || User.current.allowed_to?(:manage_issue_relations, @project) %>
+
+  <div id="relations">
+  <%= render :partial => 'issues/relations' %>
+  </div>
+  <% end %>
+</section>
+<% end %>
+
+<section class="w-full bg-white shadow px-8 py-8 flex no-wrap flex-col mt-2">
+  <div id="history">
+    <%= render_tabs issue_history_tabs, issue_history_default_tab %>
+  </div>
+
+  <% if @issue.notes_addable? %>
+    <%= form_with url: add_note_my_space_inbox_path(@issue.id), method: :post, multipart: true, local: true do |f| %>
+          <fieldset id="add_notes" class="border-0!"><legend><%= l(:field_notes) %></legend>
+          <%= f.text_area :notes, :cols => 60, :rows => 10, :class => 'wiki-edit',
+                :data => {
+                    :auto_complete => true
+                },
+                :no_label => true %>
+          <%= wikitoolbar_for 'issue_notes', preview_issue_path(:project_id => @project ||= @issue.project , :issue_id => @issue) %>
+
+          <% if @issue.safe_attribute? 'private_notes' %>
+          <div class="flex items-center space-x-2 my-1">
+            <%= f.check_box :private_notes, :no_label => true %> <label for="issue_private_notes"><%= l(:field_private_notes) %></label>
+          </div>
+          <% end %>
+
+          <%= call_hook(:view_issues_edit_notes_bottom, { :issue => @issue, :notes => @notes, :form => f }) %>
+          </fieldset>
+
+          <%= f.hidden_field :lock_version %>
+        <%= hidden_field_tag 'last_journal_id', params[:last_journal_id] || @issue.last_journal_id %>
+        <div class="flex justify-end items-center space-x-2">
+
+          <%= link_to(
+              l(:button_cancel), issue_path(id: @issue.id),
+              :onclick => params[:action] == 'show' ? "$('#update').hide(); return false;" : ''
+            ) %>
+
+            <%= submit_tag l(:button_submit) %>
+        </div>
+
+
+      <% end %>
+    <% end %>
+
+</section>
+

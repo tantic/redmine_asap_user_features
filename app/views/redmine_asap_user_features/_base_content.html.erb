@@ -1,0 +1,4 @@
+<% if (controller.is_a? TodoController) || (controller.is_a? InboxController) %>
+<%= javascript_include_tag 'js/app.js', :plugin => 'redmine_asap_user_features' %>
+<%= javascript_include_tag 'js/chunk-vendors.js', :plugin => 'redmine_asap_user_features' %>
+<% end %>

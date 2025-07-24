@@ -1,0 +1,48 @@
+<div class="user-card" data-user-popover-target="card">
+  <h2 class="title">
+    <%= avatar @user, :size => "50" %> <%= @user.name %>
+  </h2>
+
+  <% unless @user.pref.hide_mail %>
+    <div class="user-info flex items-center py-2">
+      <div class="flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-3 icon-card" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <%= mail_to(@user.mail, nil, :encode => 'javascript') %>
+      </div>
+    </div>
+  <% end %>
+  <% @user.visible_custom_field_values.each do |custom_value| %>
+    <% if !custom_value.value.blank? %>
+      <div class="user-info flex items-center py-2">
+        <%= custom_value.custom_field.name %>: <%= show_value(custom_value) %></div>
+    <% end %>
+  <% end %>
+    <div class="user-info flex items-center py-2">
+      <div class="flex items-center  justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="h-4 w-4 mr-3 icon-card" viewBox="0 0 16 16">
+          <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
+          <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
+        </svg>
+      </div>
+      <div>
+        <%= format_date(@user.created_on) %>
+      </div>
+    </div>
+  <% unless @user.last_login_on.nil? %>
+    <div class="user-info flex items-center py-2">
+      <div class="flex items-center  justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="h-4 w-4 mr-3 icon-card" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"/>
+          <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+        </svg>
+      </div>
+      <div>
+        <%= format_date(@user.last_login_on) %>
+      </div>
+    </div>
+  <% end %>
+</div>

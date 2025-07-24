@@ -1,0 +1,2 @@
+module UserCardHelper
+end

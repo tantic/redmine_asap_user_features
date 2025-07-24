@@ -1,0 +1,78 @@
+<div class="flex h-[calc(100vh-6rem)]  overflow-auto">
+  <%= render "shared/sidebar" %>
+
+
+  <div data-controller="todo" class="flex flex-col flex-1 h-full pl-20 pr-8 w-full">
+    <div class="flex flex-col md:flex-row items-center  mt-8 mb-2 px-4 md:px-0">
+      <div class="ml-auto flex items-center justify-end w-36">
+
+      </div>
+    </div>
+    <div class="flex flex-col  md:flex-row px-0 mt-4 mb-0 h-[calc(100vh-160px)] w-full overflow-x-auto">
+      <% @todo_lists.each do |list| %>
+        <div class="flex h-full md:overflow-hidden w-full md:w-64 mr-4 mb-4 md:mb-0 flex-col flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-lg py-4 px-4 md:p-4">
+          <div class="h-auto  flex flex-col">
+            <h1 class="flex items-center justify-center flex-shrink-0 h-10 uppercase font-extralight text-xs">
+              <%= list.name %>
+            </h1>
+          </div>
+          <div  id="column-issues"
+                class="overflow-auto"
+                data-controller="sortable"
+                data-sortable-list-id-value="<%= list.id %>">
+            <% list.issues.each do |issue| %>
+            <div
+                data-todo-target="issue"
+                data-issue-id="<%= issue.id %>"
+                class="bg-white mt-3 rounded flex shadow dark:bg-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                <div class="flex items-center justify-center px-4 py-4">
+                  <input
+                    type="checkbox"
+                    class=""
+                    data-action="change->todo#completeIssue"
+                    data-issue-id="<%= issue.id %>"
+                    <%= 'checked' if issue.closed? %>
+                  >
+                </div>
+                <div class="font-normal text-xs w-full text-gray-900 dark:text-gray-100 nowrap dark:text-white">
+                  <%= link_to issue.subject, issue_path(issue), class: 'pr-4 py-4 flex items-center text-gray-900!' %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div data-controller="todo-add" data-todo-add-list-id-value="<%= list.id %>" class="mt-4">
+            <button
+              type="button"
+              class="px-2 py-1 font-light cursor-pointer"
+              data-action="click->todo-add#showForm"
+              data-todo-add-target="plusButton"
+              >
+              <%= l(:label_todo_add) %>
+            </button>
+            <form
+              data-action="submit->todo-add#addIssue"
+              class="hidden! flex items-center mt-2"
+              data-todo-add-target="form"
+            >
+              <input type="text"
+                    class="border border-white bg-white! p-4 rounded"
+                    placeholder="<%= l(:label_todo_new) %>"
+                    data-todo-add-target="input" />
+                  <div class="mt-4">
+              <button type="submit" class="ml-2 bg-blue-500! hover:bg-blue-600 px-3 py-1 mb-2 rounded text-white"><%= l(:label_todo_create) %></button>
+              <button
+                type="button"
+                class="ml-1 px-2 py-1 cursor-pointer"
+                data-action="click->todo-add#cancelForm"
+                ><%= l(:label_todo_cancel) %></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

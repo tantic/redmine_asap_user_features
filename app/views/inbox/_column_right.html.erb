@@ -1,0 +1,8 @@
+
+<div class="flex-1 w-full h-full sm:overflow-y-auto p-4" data-inbox-target="detail">
+  <% if @first_issue %>
+    <%= render partial: "detail", locals: { issue: @first_issue, journals: @journals } %>
+  <% else %>
+    <p>Aucune demande assignée</p>
+  <% end %>
+</div>

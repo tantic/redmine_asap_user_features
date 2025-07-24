@@ -1,0 +1,11 @@
+<p>
+  <label for="settings_menu_todo_project_parent"><%= l(:label_menu_todo_project_parent) %></label>
+  <%= select_tag "settings[settings_menu_todo_project_parent]", options_for_select(
+      Project.all.map{|q| [q.name, q.id]}, @settings["settings_menu_todo_project_parent"]), :multiple => false, :include_blank => true %>
+</p>
+
+<p>
+  <label for="settings_menu_todo_tracker"><%= l(:label_menu_todo_tracker) %></label>
+  <%= select_tag "settings[settings_menu_todo_tracker]", options_for_select(
+      Tracker.all.map{|q| [q.name, q.id]}, @settings["settings_menu_todo_tracker"]), :multiple => false, :include_blank => true %>
+</p>
