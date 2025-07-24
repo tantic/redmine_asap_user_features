@@ -6,9 +6,8 @@ Plugin wich add some user features
 
 # Prerequisite
 
-2 externals plugins are required
-* redmine checklists
-* remine tags
+1 external plugin is required
+* redmine asap theme
 
 # Installation
 
