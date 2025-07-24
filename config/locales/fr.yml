@@ -1,10 +1,4 @@
 fr:
-  label_avatar: "Avatar"
-  message_avatar_uploaded: "Avatar enregistré"
-  button_change_avatar: "Modifier l'avatar"
-  are_you_sure_delete_avatar: "Êtes-vous certain de vouloir supprimer votre avatar?"
-  avatar_deleted: "Avatar supprimé"
-  unable_to_delete_avatar: "Une erreur est survenue lors de la suppression de l'avatar."
   label_menu_asap_my_space: "Mon espace"
   label_menu_asap_todo: "Todo"
   label_menu_asap_inbox: "Boîte de réception"

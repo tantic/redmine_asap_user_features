@@ -1,3 +1,16 @@
 # English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  label_menu_asap_my_space: "My space"
+  label_menu_asap_todo: "Todo"
+  label_menu_asap_inbox: "Inbox"
+  label_created_on: Created on
+  todo_category: "Todo"
+  todo_link: "My tasks"
+  inbox_category: Inbox
+  inbox_favorite_category: favorite
+  inbox_link: Assigned to
+  configuration_required_message: The plugin need to be set before use it
+  label_todo_add: + Add
+  label_todo_create: Create
+  label_todo_cancel: Cancel
+  label_todo_new: New task...
