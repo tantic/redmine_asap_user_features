@@ -3,14 +3,11 @@
 Plugin wich add some user features
 * todo : each user has a personal space where he can manage his own tasks
 * inbox : display personal issues from all the projects
-* user card : display user information on over the user link
-* avatar : display avatar for all user or letters if not
+
 
 # Prerequisite
 
-2 externals plugins are required 
-* redmine checklists
-* remine tags
+This plugin needs
 
 # Installation
 
