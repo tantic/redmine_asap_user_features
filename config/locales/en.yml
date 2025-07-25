@@ -1,5 +1,7 @@
 # English strings go here for Rails i18n
 en:
+  label_list_default: Default list
+  label_list_personal_project: Personal project -
   label_menu_asap_my_space: "My space"
   label_menu_asap_todo: "Todo"
   label_menu_asap_inbox: "Inbox"
@@ -14,3 +16,11 @@ en:
   label_todo_create: Create
   label_todo_cancel: Cancel
   label_todo_new: New task...
+  label_list_new: New list
+  label_list_name: Name
+  label_list_cancel: Cancel
+  label_list_save: Save
+  label_list_create: Create
+  label_list_edit: Edit
+  label_list_delete: Delete
+  label_list_delete_confirm: Are you sure you want to delete the list %{name}?
