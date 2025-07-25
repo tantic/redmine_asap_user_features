@@ -8,9 +8,16 @@ Plugin wich add some user features
 
 # Prerequisite
 
-2 externals plugins are required 
+2 externals plugins are required
 * redmine checklists
 * remine tags
+
+# Screenshots
+
+![Inbox](doc/inbox.png)
+
+![Todo](doc/todo.png)
+
 
 # Installation
 
