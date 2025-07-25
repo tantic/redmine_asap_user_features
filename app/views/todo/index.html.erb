@@ -31,13 +31,15 @@
                    class="opacity-0 group-hover:opacity-100 cursor-pointer p-2 rounded-full hover:bg-gray-200 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 hover:text-gray-800">
                 <%= sprite_icon('dots-vertical', plugin: 'redmine_asap_user_features', size: 20, css_class: 'stroke-gray-800!') %>
               </div>
-              <div class="absolute right-0 shadow rounded border border-gray-50 mt-0 bg-white z-49 w-24 top-8 hidden" data-todo-target="listmenu">
-                <div class="px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
+              <div class="absolute right-0 shadow rounded border border-gray-50 mt-0 bg-white z-49 w-44 top-8 hidden" data-todo-target="listmenu">
+                <div class="px-4 py-2.5 inline-flex hover:bg-gray-50 cursor-pointer w-full"
                   data-action="click->todo#updateList"
                   data-url="<%= edit_my_space_todo_list_path(id: list.id, project_id: @user_project.id) %>">
+                  <%= sprite_icon('edit', size: 18, css_class: 'stroke-gray-800! mr-2') %>
                   <%= l(:label_list_edit) %>
                 </div>
-                <%= link_to my_space_todo_list_path(list), method: :delete, data: {confirm: t("label_list_delete_confirm", name: list.name)} do %>
+                <%= link_to my_space_todo_list_path(list), method: :delete, class: 'px-4 py-2.5 w-full inline-flex hover:bg-gray-50 cursor-pointer text-gray-900!', data: {confirm: t("label_list_delete_confirm", name: list.name)} do %>
+                  <%= sprite_icon('del', size: 18, css_class: 'stroke-gray-800! mr-2') %>
                   <%= l(:label_list_delete) %>
                 <% end %>
               </div>
