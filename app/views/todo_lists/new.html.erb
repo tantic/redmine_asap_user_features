@@ -1,0 +1,16 @@
+<div data-todo-target="modal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+  <div data-todo-target="modalBody" class="bg-white p-4 rounded-lg shadow-xl w-full max-w-lg">
+    <h2 class="text-lg font-semibold mb-4"><%= l(:label_list_new) %></h2>
+    <%= form_with model: @todo_list, url: my_space_todo_lists_path, local: true do |f| %>
+      <div class="mb-4">
+        <%= hidden_field_tag :project_id, @user_project.id %>
+        <%= f.label :title, l(:label_list_name), class: "block text-sm font-medium" %>
+        <%= f.text_field :name, class: "mt-1 block w-full border rounded" %>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="button" data-action="click->todo#hide" class="text-gray-600 hover:underline"><%= l(:label_list_cancel) %></button>
+        <%= f.submit l(:label_list_create), class: "bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>

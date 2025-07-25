@@ -53,4 +53,10 @@ scope path: 'my-space', as: 'my_space' do
     end
     post 'add_note', on: :member
   end
+  resources :todo, only: [:index] do
+    collection do
+      post :synchronize
+    end
+  end
+  resources :todo_lists, only: [:new, :create, :edit, :update, :show, :destroy]
 end

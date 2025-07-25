@@ -2,19 +2,47 @@
   <%= render "shared/sidebar" %>
 
 
-  <div data-controller="todo" class="flex flex-col flex-1 h-full pl-20 pr-8 w-full">
+  <div data-controller="todo" data-todo-newlist-value="<%= new_my_space_todo_list_path(project_id: @user_project.id) %>" class="flex flex-col flex-1 h-full pl-20 pr-8 w-full">
     <div class="flex flex-col md:flex-row items-center  mt-8 mb-2 px-4 md:px-0">
       <div class="ml-auto flex items-center justify-end w-36">
+        <%= link_to synchronize_my_space_todo_index_path,
+            method: :post,
+            data: { turbo_confirm: 'Synchroniser les listes de tâches avec les versions du projet ?' },
+            class: 'p-2 rounded-full hover:bg-gray-100 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 hover:text-gray-800' do %>
+            <%= sprite_icon('reload', plugin: 'redmine_asap_user_features', size: 20, css_class: 'stroke-gray-800!') %>
+            <% end %>
+        <button
+            data-action="click->todo#newList"
+            class="cursor-pointer bg-blue-700 rounded-full hover:bg-blue-800 p-2 ml-2">
+          <%= sprite_icon('plus', plugin: 'redmine_asap_user_features', size: 20, css_class: 'stroke-blue-100!') %>
+        </button>
 
       </div>
     </div>
-    <div class="flex flex-col  md:flex-row px-0 mt-4 mb-0 h-[calc(100vh-160px)] w-full overflow-x-auto">
+    <div class="flex flex-col  md:flex-row px-0 mt-0 mb-0 h-[calc(100vh-160px)] w-full overflow-x-auto">
       <% @todo_lists.each do |list| %>
         <div class="flex h-full md:overflow-hidden w-full md:w-64 mr-4 mb-4 md:mb-0 flex-col flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-lg py-4 px-4 md:p-4">
-          <div class="h-auto  flex flex-col">
-            <h1 class="flex items-center justify-center flex-shrink-0 h-10 uppercase font-extralight text-xs">
+          <div class="group flex items-center w-full">
+            <h1 class="py-2.5! flex items-center justify-center mb-0! uppercase font-extralight text-xs">
               <%= list.name %>
             </h1>
+            <div class="ml-auto relative">
+              <div data-action="click->todo#showAdminList"
+                   class="opacity-0 group-hover:opacity-100 cursor-pointer p-2 rounded-full hover:bg-gray-200 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 hover:text-gray-800">
+                <%= sprite_icon('dots-vertical', plugin: 'redmine_asap_user_features', size: 20, css_class: 'stroke-gray-800!') %>
+              </div>
+              <div class="absolute right-0 shadow rounded border border-gray-50 mt-0 bg-white z-49 w-24 top-8 hidden" data-todo-target="listmenu">
+                <div class="px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
+                  data-action="click->todo#updateList"
+                  data-url="<%= edit_my_space_todo_list_path(id: list.id, project_id: @user_project.id) %>">
+                  <%= l(:label_list_edit) %>
+                </div>
+                <%= link_to my_space_todo_list_path(list), method: :delete, data: {confirm: t("label_list_delete_confirm", name: list.name)} do %>
+                  <%= l(:label_list_delete) %>
+                <% end %>
+              </div>
+            </div>
+
           </div>
           <div  id="column-issues"
                 class="overflow-auto"
@@ -73,6 +101,11 @@
         </div>
       <% end %>
     </div>
+    <div data-todo-target="app"></div>
 
+    </div>
   </div>
+
+
+
 </div>

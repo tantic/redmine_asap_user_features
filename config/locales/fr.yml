@@ -1,4 +1,6 @@
 fr:
+  label_list_default: Liste par défaut
+  label_list_personal_project: Projet personnel -
   label_menu_asap_my_space: "Mon espace"
   label_menu_asap_todo: "Todo"
   label_menu_asap_inbox: "Boîte de réception"
@@ -13,3 +15,11 @@ fr:
   label_todo_create: Créer
   label_todo_cancel: Annuler
   label_todo_new: Nouvelle tâche...
+  label_list_new: Nouvelle liste
+  label_list_name: Nom
+  label_list_cancel: Annuler
+  label_list_save: Enregistrer
+  label_list_create: Créer
+  label_list_edit: Modifier
+  label_list_delete: Supprimer
+  label_list_delete_confirm: Etes-vous sûr de supprimer la liste %{name}?

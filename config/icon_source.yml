@@ -25,4 +25,9 @@
   svg: inbox
 - name: checklist
   svg: checklist
-
+- name: reload
+  svg: reload
+- name: plus
+  svg: plus
+- name: dots-vertical
+  svg: dots-vertical

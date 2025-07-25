@@ -69,15 +69,18 @@ class TodoController < ApplicationController
   def move_issue
     issue = Issue.find(params[:id])
     new_list = TodoList.find(params[:list_id])
-    project = new_list.project
 
+    # Met à jour ou crée le lien dans TodolistIssue
     link = TodolistIssue.find_or_initialize_by(issue: issue)
-
     link.todo_list = new_list
-    # link.project = project # au cas où tu stockes aussi project
     link.save!
 
-    # Réordonnancement si nécessaire
+    # Met à jour la version de l'issue si différente
+    if issue.fixed_version_id != new_list.version_project_id
+      issue.update!(fixed_version_id: new_list.version_project_id)
+    end
+
+    # Réordonnancement dans la nouvelle liste
     if params[:ordered_ids].present?
       params[:ordered_ids].each_with_index do |id, index|
         ti = TodolistIssue.find_by(issue_id: id, todo_list_id: new_list.id)
@@ -87,6 +90,7 @@ class TodoController < ApplicationController
 
     render json: { status: 'ok' }
   end
+
 
 
   def reorder_list
@@ -101,6 +105,16 @@ class TodoController < ApplicationController
     render json: { status: 'ok' }
   end
 
+
+  def synchronize
+    synchronize_todo_lists_with_project_versions
+    respond_to do |format|
+      format.html { redirect_to my_space_todo_index_path }
+      format.js
+    end
+  end
+
+
   private
 
   def find_project
@@ -114,7 +128,7 @@ class TodoController < ApplicationController
       @user_project = Project.find_by_identifier(project_id)
       tracker_task = Tracker.where(:id => Setting.plugin_redmine_asap_user_features['settings_menu_todo_tracker'].to_i).sorted.to_a
       if !@user_project
-        project_name = "Projet personnel - " + User.current.to_s
+        project_name = l(:label_list_personal_project) + User.current.to_s
 
         @user_project = Project.new(:name => project_name, :identifier => project_id, :parent_id => Setting.plugin_redmine_asap_user_features['settings_menu_todo_project_parent'].to_i, :is_public => false)
         @user_project.add_default_member(User.current)
@@ -124,7 +138,7 @@ class TodoController < ApplicationController
         @user_project.disable_module!(:time_tracking)
         @user_project.trackers = tracker_task
         @user_project.save!
-        default_version = Version.new(:project_id => @user_project.id, :name => "Liste par défaut")
+        default_version = Version.new(:project_id => @user_project.id, :name => l(:label_list_default))
         @user_project.default_version = default_version
         @user_project.save
         return @user_project
@@ -134,89 +148,70 @@ class TodoController < ApplicationController
     end
   end
 
+  def synchronize_versions_if_needed
+    @user_project ||= find_project
+    synchronize_todo_lists_with_project_versions
+  end
+
 
   def synchronize_todo_lists_with_project_versions
-    todo_lists = TodoList.where(:project_id => @user_project.id, :type_list => 'list')
-    versions = @user_project.versions
-    issues = Issue.where(:project_id => @user_project.id, :fixed_version => nil)
-    issues_todo_lists_count = 0
-    # if there are versions in the project, sync them
-    if versions.length > 0
-      versions.each do |version|
-        if todo_lists.length == 0
-          todo_list = TodoList.new(:name => version.name, :project_id => @user_project.id.to_i, :version_project_id => version.id, :type_list => 'list')
-          todo_list.issues = Issue.where(:fixed_version_id => version.id)
-          todo_list.save
-        else
-          test_todo = todo_lists.map{|a| a.version_project_id == version.id}
-          # if version exist but not the todo_list then create it
-          if !test_todo.include?(true)
-            todo_list = TodoList.new(:name => version.name, :project_id => @user_project.id.to_i, :version_project_id => version.id, :type_list => 'list')
-            todo_list.issues = Issue.where(:fixed_version_id => version.id)
-            todo_list.save
-          end
-          # if versons has changed then update the todo_list
-          todo_lists.each do |todo_list|
-            if version.id == todo_list.version_project_id
-              if version.updated_on != todo_list.updated_at
-                todo_list.name = version.name
-                todo_list.save
-              end
-            end
-          end
-        end
-      end
-    else
-      if todo_lists.length == 0
-        version = Version.new(:name => 'Liste par défaut', :project_id => @user_project.id)
-        version.save
-        todo_list = TodoList.new(:name => version.name, :project_id => @user_project.id.to_i, :version_project_id => version.id, :type_list => 'list')
-        todo_list.save
-      end
-    end
+    # Supprimer les todo_lists dont la version n'existe plus
+    existing_version_ids = @user_project.versions.pluck(:id)
+    orphan_lists = TodoList.where(project_id: @user_project.id, type_list: 'list')
+                          .where.not(version_project_id: existing_version_ids)
 
-    # there are some issues without version in the project, assign them to the default list and version
-    if issues.length > 0
-      if todo_lists.length > 0
-        issues.each do |issue|
-          todoIssue = TodolistIssue.where(:issue_id => issue.id).first
-          # issue was attached to a todolist which has been deleted
-          if todoIssue
-            todoIssue.todo_list_id = todo_lists.first.id
-            todoIssue.save
-          else
-            todo_list_issue = TodolistIssue.new(:todo_list_id => todo_lists.first.id, :issue_id => issue.id)
-            todo_list_issue.save
-          end
-          issue.fixed_version_id = todo_lists.first.version_project_id
-          issue.save
-        end
+    orphan_lists.each do |list|
+      Rails.logger.info "[TODO] Suppression de la todo_list orpheline #{list.name} (id=#{list.id})"
+      list.destroy
+    end
+    versions = @user_project.versions.to_a
+    todo_lists = TodoList.where(project_id: @user_project.id, type_list: 'list').to_a
+
+    # Crée les todo_lists manquantes
+    versions.each do |version|
+      matching_list = todo_lists.find { |tl| tl.version_project_id == version.id }
+
+      if matching_list.nil?
+        TodoList.create!(
+          name: version.name,
+          project_id: @user_project.id,
+          version_project_id: version.id,
+          type_list: 'list'
+        )
       else
-        issues.each do |issue|
-          issue.fixed_version_id = todo_lists.first.version_project_id
-          issue.save
+        # Met à jour le nom si besoin
+        if matching_list.name != version.name
+          matching_list.update(name: version.name)
         end
       end
     end
 
-    # number of issues in project is not the same that in the todo_list
-    todo_lists.each do |todo_list|
-      issues_todo_lists_count = issues_todo_lists_count + todo_list.issues.count
+    # Crée une version par défaut s'il n'y a aucune version ni liste
+    if versions.empty? && todo_lists.empty?
+      version = Version.create!(name: 'Liste par défaut', project_id: @user_project.id)
+      TodoList.create!(
+        name: version.name,
+        project_id: @user_project.id,
+        version_project_id: version.id,
+        type_list: 'list'
+      )
     end
-    issues_in_project = Issue.where(:project_id => @user_project.id)
-    if issues_in_project.count > issues_todo_lists_count
-      issues_in_project.each do |issue|
-        todoIssue = TodolistIssue.where(:issue_id => issue.id).first
-        if todoIssue
 
-        else
-          todo_list = TodoList.where(:project_id => @user_project.id, :version_project_id => issue.fixed_version_id)
-          todo_list_issue = TodolistIssue.new(:todo_list_id => todo_lists.first.id, :issue_id => issue.id)
-          todo_list_issue.save
-        end
+    # Synchronise les issues sans version vers la première todo_list
+    default_list = TodoList.where(project_id: @user_project.id).first
+    default_version_id = default_list&.version_project_id
+
+    if default_list && default_version_id
+      Issue.where(project_id: @user_project.id, fixed_version_id: nil).each do |issue|
+        # Associe la version
+        issue.update(fixed_version_id: default_version_id)
+
+        # Crée le lien avec la todo_list s'il n'existe pas
+        TodolistIssue.find_or_create_by!(issue_id: issue.id, todo_list_id: default_list.id)
       end
     end
   end
+
 
   def find_todo_list
     @todo_list = TodoList.where(:project_id => @user_project.id.to_i).first
