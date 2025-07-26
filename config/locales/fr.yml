@@ -4,6 +4,7 @@ fr:
   label_menu_asap_my_space: "Mon espace"
   label_menu_asap_todo: "Todo"
   label_menu_asap_inbox: "Boîte de réception"
+  label_menu_asap_watched_issues: Mes demandes observées
   label_created_on: Créé il y a
   todo_category: "Todo"
   todo_link: "Mes tâches"

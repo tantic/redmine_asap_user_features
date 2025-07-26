@@ -5,6 +5,7 @@ en:
   label_menu_asap_my_space: "My space"
   label_menu_asap_todo: "Todo"
   label_menu_asap_inbox: "Inbox"
+  label_menu_asap_watched_issues: Watched issues
   label_created_on: Created on
   todo_category: "Todo"
   todo_link: "My tasks"
