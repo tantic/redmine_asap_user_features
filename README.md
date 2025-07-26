@@ -15,6 +15,10 @@ You'll need to install Redmine asap theme : https://github.com/tantic/redmine_as
 ![Todo](doc/todo.png)
 
 
+# Documentation
+
+https://tantic.github.io/redmine_asap_docs/docs/user-features/intro
+
 # Installation
 
 Same as usual
