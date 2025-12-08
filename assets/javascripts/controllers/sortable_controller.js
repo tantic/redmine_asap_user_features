@@ -1,12 +1,16 @@
-(() => {
-  const application = Stimulus.Application.start()
+(async function () {
+  // Wait for Stimulus application to be available
+  while (typeof Stimulus === 'undefined') {
+      await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
-  application.register("sortable", class extends Stimulus.Controller {
+  // Import Controller from Stimulus module
+  const { Controller } = await import('@hotwired/stimulus');
 
-    static get values() {
-      return {
-        listId: Number
-      }
+  Stimulus.register("sortable", class extends Controller {
+
+    static values = {
+      listId: Number
     }
 
 
@@ -54,8 +58,9 @@
     disconnect() {
       if (this.sortable) this.sortable.destroy()
     }
-  })
-})()
+ });
+
+})();
 
 
 

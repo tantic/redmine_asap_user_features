@@ -1,17 +1,18 @@
-(() => {
-  const application = Stimulus.Application.start()
+(async function () {
+  // Wait for Stimulus application to be available
+  while (typeof Stimulus === 'undefined') {
+      await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
-  application.register("todo", class extends Stimulus.Controller {
-    static get targets() {
-      return [ "issue", "modal", "modalBody","app", "listmenu"]
-    }
+  // Import Controller from Stimulus module
+  const { Controller } = await import('@hotwired/stimulus');
 
+  Stimulus.register("todo", class extends Controller {
+    static targets = [ "issue", "modal", "modalBody","app", "listmenu"]
 
-    static get values() {
-      return {
-        newlist: String,
-        updatelist: String
-      }
+    static values = {
+      newlist: String,
+      updatelist: String
     }
 
     connect(){
@@ -132,5 +133,6 @@
     }
 
 
-  })
-})()
+ });
+
+})();

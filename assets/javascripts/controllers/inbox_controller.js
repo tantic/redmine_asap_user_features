@@ -1,9 +1,18 @@
-(() => {
-  const application = Stimulus.Application.start()
+(async function () {
+  // Wait for Stimulus application to be available
+  while (typeof Stimulus === 'undefined') {
+      await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
-  application.register("inbox", class extends Stimulus.Controller {
-    static get targets() {
-      return [ "list", "detail", "item" ]
+  // Import Controller from Stimulus module
+  const { Controller } = await import('@hotwired/stimulus');
+
+  Stimulus.register("inbox", class extends Controller {
+
+    static targets = [ "list", "detail", "item" ]
+
+     connect(){
+      console.log("Dans la inbox")
     }
 
     show(event) {
@@ -33,5 +42,6 @@
           this.detailTarget.innerHTML = html
         })
     }
-  })
-})()
+ });
+
+})();

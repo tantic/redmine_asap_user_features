@@ -1,6 +1,6 @@
 <div class="user-card" data-user-popover-target="card">
   <h2 class="title">
-    <%= avatar @user, :size => "50" %> <%= @user.name %>
+    <%= avatar @user, :size => "40" %> <span class="username"><%= @user.name %></span>
   </h2>
 
   <% unless @user.pref.hide_mail %>

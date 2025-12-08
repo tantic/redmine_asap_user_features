@@ -1,12 +1,14 @@
 class InboxController < ApplicationController
-  self.main_menu = false
-  before_action :find_issues_counts
   helper :all
+  before_action :find_issues_counts
+  self.main_menu = false
   layout 'inbox'
+
 
 
   # INBOX
   def index
+
     @issues = Issue.visible.open
               .assigned_to(User.current)
               .order(Arel.sql("COALESCE(issues.updated_on, issues.created_on) DESC"))
@@ -49,7 +51,7 @@ class InboxController < ApplicationController
 
   def add_note
     @issue = Issue.find(params[:id])
-    @project = @issue.project
+    # @project = @issue.project   <-- retirer cette ligne
 
     unless @issue.notes_addable?
       render plain: "Not allowed", status: :forbidden
