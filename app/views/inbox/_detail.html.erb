@@ -1,12 +1,12 @@
 <% @issue ||= defined?(issue) ? issue : nil %>
 <% @journals ||= defined?(journals) ? journals : [] %>
 
-<header class="w-full bg-white shadow px-8 py-4 flex items-center mb-2">
+<header class="w-full relative bg-white dark:bg-gray-800 shadow px-8 py-4 flex items-center mb-2">
   <h3 class="font-medium py-2 my-0! text-sm flex">
     <strong>#<%= @issue.id %></strong> - <%= @issue.subject %>
   </h3>
 
-  <div id="issue-menu" class="contextual ml-auto!">
+  <div id="issue-menu" class="ml-auto!">
 
     <%= actions_dropdown do %>
       <%= link_to sprite_icon('edit', l(:button_edit)), edit_issue_path(@issue),
@@ -30,7 +30,7 @@
 
 </header>
 
-<section class="w-full bg-white shadow px-8 py-8 flex flex-col">
+<section class="w-full bg-white dark:bg-gray-800 shadow px-8 py-8 flex flex-col">
   <div class="flex items-center mb-4">
     <%= author_avatar(@issue.author, :size => "30") %>
     <div class="ml-3 flex flex-col">
@@ -38,7 +38,7 @@
     </div>
     <div class="ml-auto"><%= link_to_project(@issue.project) %></div>
   </div>
-  <div id="attribute" class="bg-gray-50 rounded p-8">
+  <div id="attribute" class="bg-gray-50 dark:bg-gray-700 rounded p-8">
     <%= issue_fields_rows do |rows|
       rows.left l(:field_status), @issue.status.name, :class => 'status'
 
@@ -76,7 +76,7 @@
 
 </section>
 
-<section class="w-full bg-white shadow px-8 py-2 flex no-wrap flex-col">
+<section class="w-full bg-white dark:bg-gray-800 shadow px-8 py-2 flex no-wrap flex-col">
   <% if @issue.description? %>
   <div id="issue_description_wiki" class="wiki py-4 mb-6 text-wrap">
     <%= textilizable @issue, :description, :attachments => @issue.attachments %>
@@ -84,7 +84,7 @@
   <% end %>
 
   <% if @issue.attachments.any? %>
-    <div id="issue-attachments" class="border-t border-gray-100 pt-6 mb-6">
+    <div id="issue-attachments" class="border-t border-gray-100 dark:border-gray-600 pt-6 mb-6">
       <p class="pb-4"><strong><%=l(:label_attachment_plural)%></strong></p>
       <%= link_to_attachments @issue, :thumbnails => true %>
     </div>
@@ -95,7 +95,7 @@
 
 
 <% if !@issue.leaf? || User.current.allowed_to?(:manage_subtasks, @project) || @relations.present? || User.current.allowed_to?(:manage_issue_relations, @project)  %>
-<section class="w-full bg-white shadow px-8 py-8 flex no-wrap flex-col mt-2">
+<section class="w-full bg-white dark:bg-gray-800 shadow px-8 py-8 flex no-wrap flex-col mt-2">
   <% if !@issue.leaf? || User.current.allowed_to?(:manage_subtasks, @project) %>
 
   <div id="issue_tree">
@@ -112,7 +112,7 @@
 </section>
 <% end %>
 
-<section class="w-full bg-white shadow px-8 py-8 flex no-wrap flex-col mt-2">
+<section class="w-full bg-white dark:bg-gray-800 shadow px-8 py-8 flex no-wrap flex-col mt-2">
   <div id="history">
     <%= render_tabs issue_history_tabs, issue_history_default_tab %>
   </div>

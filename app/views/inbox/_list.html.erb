@@ -4,7 +4,7 @@
     <% issues.each do |issue| %>
       <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
       <%= hidden_field_tag 'ids[]', issue.id %>
-        <li id="issue-<%= issue.id %>" class="bg-white hover:bg-gray-100 p-4 cursor-pointer flex  shadow border-b border-gray-100 hascontextmenu  "
+        <li id="issue-<%= issue.id %>" class="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-4 cursor-pointer flex  shadow border-b border-gray-100 dark:border-gray-600 hascontextmenu  "
             data-action="click->inbox#show"
             data-inbox-id-param="<%= issue.id %>"
             data-inbox-target="item">
@@ -13,8 +13,8 @@
             </div>
             <div class="flex flex-col">
               <div class="mb-2">
-                <span class="text-gray-700"><%= issue.author %></span>
-                <div class="ml-auto text-gray-400 text-xs">
+                <span class="text-gray-700 dark:text-gray-300"><%= issue.author %></span>
+                <div class="ml-auto text-gray-400 dark:text-gray-500 text-xs">
                   <% if issue.created_on != issue.updated_on %>
                     <%= l(:label_updated_time, time_tag(issue.updated_on)).html_safe %>
                   <% else %>

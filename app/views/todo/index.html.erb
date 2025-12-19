@@ -8,7 +8,7 @@
         <%= link_to synchronize_my_space_todo_index_path,
             method: :post,
             data: { turbo_confirm: 'Synchroniser les listes de tâches avec les versions du projet ?' },
-            class: 'p-2 rounded-full hover:bg-gray-100 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 hover:text-gray-800' do %>
+            class: 'p-2 rounded-full hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:text-gray-300 dark:hover:bg-gray-700 hover:text-gray-800' do %>
             <%= sprite_icon('reload', plugin: 'redmine_asap_user_features', size: 20, css_class: 'stroke-gray-800!') %>
             <% end %>
         <button
@@ -65,8 +65,8 @@
                     <%= 'checked' if issue.closed? %>
                   >
                 </div>
-                <div class="font-normal text-xs w-full text-gray-900 dark:text-gray-100 nowrap dark:text-white">
-                  <%= link_to issue.subject, issue_path(issue), class: 'pr-4 py-4 flex items-center text-gray-900!' %>
+                <div class="font-normal text-xs w-full text-gray-900 dark:text-gray-100 nowrap ">
+                  <%= link_to issue.subject, issue_path(issue), class: 'pr-4 py-4 flex items-center text-gray-900! dark:text-gray-100!' %>
                 </div>
               </div>
             <% end %>

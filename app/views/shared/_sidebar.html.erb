@@ -1,18 +1,18 @@
-<aside class="bg-white fixed shadow w-14 h-full">
+<aside class="bg-white dark:bg-gray-800 fixed shadow w-14 h-full">
   <ul>
     <li class="flex items-center p-2">
-      <%= link_to my_path(), class: "flex w-full items-center justify-center hover:bg-blue-50 rounded-full text-gray-900 p-2 #{'bg-blue-50' if (current_page?(my_path) || current_page?(my_page_path))}" do %>
-        <%= sprite_icon('my-page', plugin: 'redmine_asap_theme', size: 24, css_class: 'stroke-blue-800!') %>
+      <%= link_to my_path(), class: "flex w-full items-center justify-center hover:bg-blue-50 dark: hover:bg-blue-800 dark:inset-shadow-lg rounded-full text-gray-900 p-2 #{'bg-blue-50 dark:bg-blue-900' if (current_page?(my_path) || current_page?(my_page_path))}" do %>
+        <%= sprite_icon('my-page', plugin: 'redmine_asap_theme', size: 24, css_class: 'stroke-blue-800!  dark:stroke-blue-300!') %>
       <% end %>
     </li>
     <li class="flex items-center p-2">
-      <%= link_to my_space_inbox_index_path(), class: "flex w-full items-center justify-center hover:bg-blue-50 rounded-full text-gray-900 p-2 #{'bg-blue-50' if (current_page?(my_space_inbox_index_path) || (current_page?(my_space_inbox_path())  rescue false) || current_page?(watched_my_space_inbox_index_path))}" do %>
-        <%= sprite_icon('inbox', plugin: 'redmine_asap_user_features', size: 24, css_class: 'stroke-blue-800!') %>
+      <%= link_to my_space_inbox_index_path(), class: "flex w-full items-center justify-center hover:bg-blue-50 dark: hover:bg-blue-800 dark:inset-shadow-lg rounded-full text-gray-900 p-2 #{'bg-blue-50 dark:bg-blue-900' if (current_page?(my_space_inbox_index_path) || (current_page?(my_space_inbox_path())  rescue false) || current_page?(watched_my_space_inbox_index_path))}" do %>
+        <%= sprite_icon('inbox', plugin: 'redmine_asap_user_features', size: 24, css_class: 'stroke-blue-800! dark:stroke-blue-300!') %>
       <% end %>
     </li>
     <li class="flex items-center p-2">
-      <%= link_to my_space_todo_path(), class: "flex items-center justify-center hover:bg-blue-50 rounded-full text-gray-900! p-2 #{'bg-blue-50' if (current_page?(my_space_todo_path))}" do %>
-        <%= sprite_icon('checklist', plugin: 'redmine_asap_user_features', size: 24, css_class: 'stroke-blue-800!') %>
+      <%= link_to my_space_todo_path(), class: "flex items-center justify-center hover:bg-blue-50 dark: hover:bg-blue-800 dark:inset-shadow-lg rounded-full text-gray-900! p-2 #{'bg-blue-50 dark:bg-blue-900' if (current_page?(my_space_todo_path))}" do %>
+        <%= sprite_icon('checklist', plugin: 'redmine_asap_user_features', size: 24, css_class: 'stroke-blue-800! dark:stroke-blue-300!') %>
       <% end %>
     </li>
   </ul>
