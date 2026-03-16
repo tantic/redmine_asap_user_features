@@ -55,12 +55,19 @@
             if (data.id) {
                 const container = this.element.closest('.flex').querySelector('#column-issues');
                 container.insertAdjacentHTML('beforeend', `
-                  <div class="bg-white mt-3 rounded flex shadow dark:bg-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" data-issue-id="${data.id}">
+                  <div class="bg-white mt-3 rounded flex shadow dark:bg-gray-700 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 overflow-hidden"
+                       style="border-left: 4px solid #60a5fa;"
+                       data-todo-target="issue"
+                       data-issue-id="${data.id}"
+                       data-action="click->todo#showIssueDetail">
                     <div class="flex items-center justify-center px-4 py-4">
                       <input type="checkbox" class="" data-action="change->todo#completeIssue" data-issue-id="${data.id}">
                     </div>
-                    <div class="font-normal text-xs w-full text-gray-900 dark:text-gray-100 nowrap dark:text-white">
-                      <a href="/issues/${data.id}" class="pr-4 py-4 flex items-center text-gray-900!">${data.subject}</a>
+                    <div class="font-normal text-xs w-full text-gray-900 dark:text-gray-100 nowrap flex flex-col justify-center">
+                      <span class="pr-4 pt-3 pb-1 flex items-center text-gray-900 dark:text-gray-100 cursor-pointer">${data.subject}</span>
+                      <div class="my-2 mr-4 mb-2 bg-gray-200 dark:bg-gray-600 rounded-full h-1" data-progress-bar>
+                        <div class="h-1 bg-green-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                      </div>
                     </div>
                   </div>
                 `);

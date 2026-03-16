@@ -14,6 +14,9 @@ match 'users/get_avatar/:id', :to => 'users#get_avatar', :constraints => {:id=>/
 # Todo
 patch 'my-space/todo/issue/:id/complete', to: 'todo#complete_issue', as: :todo_issue_complete
 post 'my-space/todo/lists/:list_id/issues', to: 'todo#create_issue'
+get   'my-space/todo/issue/:id',       to: 'todo#show_issue',          as: :todo_issue_detail
+post  'my-space/todo/issue/:id/note',  to: 'todo#add_note_to_issue',   as: :todo_issue_note
+patch 'my-space/todo/issue/:id/field', to: 'todo#update_issue_field',  as: :todo_issue_update_field
 
 
 get 'my-space/todo', :to => 'todo#index'
@@ -50,6 +53,8 @@ scope path: 'my-space', as: 'my_space' do
   resources :inbox, only: [:index, :show] do
     collection do
       get :watched
+      get :list
+      get :overdue
     end
     post 'add_note', on: :member
   end

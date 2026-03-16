@@ -3,7 +3,7 @@
 
   <div data-controller="inbox" class="flex flex-1 h-full ml-14">
     <%= render :partial => "column_left", locals: {issues: nil, issues_watched: @issues_watched} %>
-    <%= render :partial => "column_middle", locals: {issues: @issues_watched} %>
+    <%= render :partial => "column_middle", locals: {issues: @issues_watched, has_more: @has_more, list_source: 'watched'} %>
     <%= render "column_right" %>
   </div>
 </div>

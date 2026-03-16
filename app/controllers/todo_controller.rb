@@ -1,7 +1,9 @@
 class TodoController < ApplicationController
   self.main_menu = false
 
-  before_action :find_project, except: [:configuration_required]
+  helper :all
+
+  before_action :find_project, except: [:configuration_required, :show_issue, :add_note_to_issue, :update_issue_field]
   before_action :find_todo_list, only: [:create_issue]
 
   def index
@@ -26,6 +28,12 @@ class TodoController < ApplicationController
 
     # Garde uniquement les issues ouvertes
     @todo_lists = get_only_opened_issues_from_todo_lists(@todo_lists)
+
+    # Précharge les counts de notes/commentaires pour éviter les N+1
+    all_issue_ids = @todo_lists.flat_map { |l| l.issues.map(&:id) }
+    @issue_note_counts = Journal.where(journalized_type: 'Issue', journalized_id: all_issue_ids)
+                                .where.not(notes: [nil, ''])
+                                .group(:journalized_id).count
   end
 
   def complete_issue
@@ -99,6 +107,110 @@ class TodoController < ApplicationController
   end
 
   def configuration_required
+  end
+
+  def show_issue
+    @issue = Issue.visible.find(params[:id])
+    @journals = @issue.visible_journals_with_index
+    @journals.reverse! if User.current.wants_comments_in_reverse_order?
+    @relations = @issue.relations.select { |r| r.other_issue(@issue)&.visible? }
+
+    respond_to do |format|
+      format.js do
+        render partial: 'todo/issue_panel', locals: {
+          issue: @issue,
+          journals: @journals,
+          statuses: @issue.new_statuses_allowed_to,
+          priorities: IssuePriority.active,
+          assignees: @issue.assignable_users
+        }
+      end
+    end
+  end
+
+  ALLOWED_ISSUE_FIELDS = %w[
+    subject status_id priority_id assigned_to_id fixed_version_id
+    category_id due_date start_date done_ratio estimated_hours description
+  ].freeze
+
+  def update_issue_field
+    @issue = Issue.visible.find(params[:id])
+
+    unless @issue.editable?
+      render json: { error: 'Non autorisé' }, status: :forbidden
+      return
+    end
+
+    field = params[:field].to_s
+    unless ALLOWED_ISSUE_FIELDS.include?(field)
+      render json: { error: 'Champ non autorisé' }, status: :unprocessable_entity
+      return
+    end
+
+    @issue.init_journal(User.current)
+    if @issue.update(field => params[:value])
+      response_data = { success: true }
+
+      if field == 'fixed_version_id'
+        new_version_id = params[:value].presence&.to_i
+        new_list = TodoList.find_by(version_project_id: new_version_id)
+        if new_list
+          link = TodolistIssue.find_or_initialize_by(issue: @issue)
+          link.update!(todo_list: new_list)
+          response_data[:new_list_id] = new_list.id
+        end
+      end
+
+      if field == 'priority_id'
+        default_pos = IssuePriority.default&.position || 0
+        max_pos     = IssuePriority.active.maximum(:position) || 0
+        prio_pos    = @issue.priority.position
+        response_data[:priority_level] = if prio_pos < default_pos
+          'low'
+        elsif prio_pos == default_pos
+          'normal'
+        elsif prio_pos == max_pos
+          'urgent'
+        else
+          'high'
+        end
+      end
+
+      if field == 'description'
+        response_data[:rendered_html] = view_context.textilizable(@issue, :description)
+      end
+
+      render json: response_data, status: :ok
+    else
+      render json: { errors: @issue.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def add_note_to_issue
+    @issue = Issue.visible.find(params[:id])
+
+    unless @issue.notes_addable?
+      render json: { error: 'Not allowed' }, status: :forbidden
+      return
+    end
+
+    journal = @issue.init_journal(User.current)
+    journal.notes = params[:notes]
+    journal.private_notes = params[:private_notes] == "1"
+
+    if @issue.save
+      @journals = @issue.visible_journals_with_index
+      @journals.reverse! if User.current.wants_comments_in_reverse_order?
+      render partial: 'todo/issue_panel', locals: {
+        issue: @issue,
+        journals: @journals,
+        statuses: @issue.new_statuses_allowed_to,
+        priorities: IssuePriority.active,
+        assignees: @issue.assignable_users
+      }
+    else
+      render json: { error: @issue.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private

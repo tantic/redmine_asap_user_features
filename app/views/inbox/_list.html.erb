@@ -1,34 +1,101 @@
 
 <% if issues %>
-  <ul class="mt-4">
-    <% issues.each do |issue| %>
-      <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
-      <%= hidden_field_tag 'ids[]', issue.id %>
-        <li id="issue-<%= issue.id %>" class="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-4 cursor-pointer flex  shadow border-b border-gray-100 dark:border-gray-600 hascontextmenu  "
-            data-action="click->inbox#show"
-            data-inbox-id-param="<%= issue.id %>"
-            data-inbox-target="item">
-            <div class="mr-2">
+  <%
+    today        = Date.today
+    reference    = ->(issue) { [issue.updated_on, issue.created_on].max }
+    today_issues = issues.select { |i| reference.(i).to_date == today }
+    older_issues = issues.select { |i| reference.(i).to_date <  today }
+  %>
+
+  <% if today_issues.any? %>
+    <div class="px-3 pt-3 pb-1 text-2xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+      Aujourd'hui
+    </div>
+    <ul>
+      <% today_issues.each do |issue| %>
+        <% ref_time = [issue.updated_on, issue.created_on].max %>
+        <% updated  = issue.created_on != issue.updated_on %>
+        <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do %>
+          <%= hidden_field_tag 'ids[]', issue.id %>
+          <li id="issue-<%= issue.id %>" class="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-3 cursor-pointer flex shadow border-b border-gray-100 dark:border-gray-600 hascontextmenu"
+              data-action="click->inbox#show"
+              data-inbox-id-param="<%= issue.id %>"
+              data-inbox-target="item"
+              data-search-text="<%= "##{issue.id} #{issue.subject} #{issue.author}".downcase %>">
+            <div class="mr-2 shrink-0">
               <%= author_avatar(issue.author, :size => "30") %>
             </div>
-            <div class="flex flex-col">
-              <div class="mb-2">
-                <span class="text-gray-700 dark:text-gray-300"><%= issue.author %></span>
-                <div class="ml-auto text-gray-400 dark:text-gray-500 text-xs">
-                  <% if issue.created_on != issue.updated_on %>
-                    <%= l(:label_updated_time, time_tag(issue.updated_on)).html_safe %>
-                  <% else %>
-                    <%= l(:label_created_on) %>&nbsp;<%= time_tag(issue.created_on) %>
+            <div class="flex flex-col w-full min-w-0">
+              <div class="mb-1 flex w-full items-center gap-1">
+                <span class="text-gray-700 dark:text-gray-300 text-xs truncate"><%= issue.author %></span>
+                <div class="ml-auto shrink-0 text-gray-400 dark:text-gray-500 text-xs flex items-center gap-1">
+                  <% if issue.overdue? %>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;color:#ef4444;" title="En retard">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
                   <% end %>
+                  <% if updated %>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:10px;height:10px;" title="modifié">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                  <% end %>
+                  <time datetime="<%= ref_time.iso8601 %>"><%= ref_time.strftime('%H:%M') %></time>
                 </div>
               </div>
-              <div>
-                <strong>#<%= issue.id %></strong> - <%= issue.subject %>
+              <div class="text-xs text-gray-900 dark:text-gray-200" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                <strong class="text-gray-500 dark:text-gray-400">#<%= issue.id %></strong> <%= issue.subject %>
               </div>
             </div>
-        </li>
+          </li>
+        <% end %>
       <% end %>
-    <% end %>
-  </ul>
+    </ul>
+  <% end %>
+
+  <% if older_issues.any? %>
+    <div class="px-3 pt-3 pb-1 text-2xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+      Plus ancien
+    </div>
+    <ul>
+      <% older_issues.each do |issue| %>
+        <% ref_time = [issue.updated_on, issue.created_on].max %>
+        <% updated  = issue.created_on != issue.updated_on %>
+        <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do %>
+          <%= hidden_field_tag 'ids[]', issue.id %>
+          <li id="issue-<%= issue.id %>" class="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-3 cursor-pointer flex shadow border-b border-gray-100 dark:border-gray-600 hascontextmenu"
+              data-action="click->inbox#show"
+              data-inbox-id-param="<%= issue.id %>"
+              data-inbox-target="item"
+              data-search-text="<%= "##{issue.id} #{issue.subject} #{issue.author}".downcase %>">
+            <div class="mr-2 shrink-0">
+              <%= author_avatar(issue.author, :size => "30") %>
+            </div>
+            <div class="flex flex-col w-full min-w-0">
+              <div class="mb-1 flex w-full items-center gap-1">
+                <span class="text-gray-700 dark:text-gray-300 text-xs truncate"><%= issue.author %></span>
+                <div class="ml-auto shrink-0 text-gray-400 dark:text-gray-500 text-xs flex items-center gap-1">
+                  <% if issue.overdue? %>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:11px;height:11px;color:#ef4444;" title="En retard">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                  <% end %>
+                  <% if updated %>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:10px;height:10px;" title="modifié">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                  <% end %>
+                  <time datetime="<%= ref_time.iso8601 %>"><%= format_time(ref_time) %></time>
+                </div>
+              </div>
+              <div class="text-xs text-gray-900 dark:text-gray-200" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                <strong class="text-gray-500 dark:text-gray-400">#<%= issue.id %></strong> <%= issue.subject %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  <% end %>
+
 <% end %>
 <%= context_menu %>
